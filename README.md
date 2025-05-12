@@ -1,6 +1,6 @@
 # PlayPod - Музыкальный плеер(веб-сайт)
 
-Video-demo: https://drive.google.com/file/d/1Ey0QhTIkMgcvNkjJMqfELwADPJdHTbcp/view?usp=sharing
+Video-demo(включите 1.5x скорость видео): https://drive.google.com/file/d/1Ey0QhTIkMgcvNkjJMqfELwADPJdHTbcp/view?usp=sharing
 
 ## Краткое описание проекта
 
