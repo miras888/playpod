@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+
+{% block title %}Add to Playlist{% endblock %}
+
+{% block main %}
+<h1>Add "{{ song.title }}" to Playlist</h1>
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card p-4">
+            <div class="card-body">
+                <h5 class="card-title mb-4">Select a Playlist</h5>
+
+                <form action="{{ url_for('handle_add_to_playlist') }}" method="post">
+                    <input type="hidden" name="song_id" value="{{ song.id }}">
+
+                    <div class="mb-3">
+                        <label for="playlist-select" class="form-label">Choose Playlist:</label>
+                        <select name="playlist_id" id="playlist-select" class="form-select" required>
+
+                            {% for playlist in playlists %}
+                            <option value="{{ playlist.id }}">{{ playlist.title }}</option>
+                            {% endfor %}
+                        </select>
+
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Add Song to Selected Playlist</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

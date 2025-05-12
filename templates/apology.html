@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block title %}Oops{% endblock %}
+
+{% block main %}
+<div class="container py-5 text-center">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <i class="bi bi-exclamation-triangle display-1 text-warning"></i>
+            <h1 class="mt-4">{{ top }}</h1>
+            <p class="lead text-muted">{{ bottom }}</p>
+            <a href="/" class="btn btn-primary mt-3">Return to Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

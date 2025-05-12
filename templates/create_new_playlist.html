@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block title %}Create Playlist{% endblock %}
+
+{% block main %}
+<h1>Create New Playlist</h1>
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card p-4">
+            <div class="card-body">
+                <h5 class="card-title mb-4">Enter Playlist Name</h5>
+
+                <form action="{{ url_for('create_new_playlist') }}" method="post">
+                    <div class="mb-3">
+                        <label for="playlist-name" class="form-label">Playlist Name:</label>
+                        <input type="text" name="playlist_name" id="playlist-name" class="form-control" required
+                            placeholder="My Awesome Playlist">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Create Playlist</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

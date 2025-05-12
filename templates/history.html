@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block title %}Listening History{% endblock %}
+
+{% block main %}
+<div class="container my-4">
+    <h1 class="mb-4">Listening History</h1>
+
+    {% if grouped_history %}
+    {% for date, songs_on_date in grouped_history.items() %}
+    <h3 class="mt-4 mb-3">{{ date }}</h3>
+    <div class="list-group">
+        {% for song in songs_on_date %}
+        <div class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+
+                {% if song.album_cover %}
+                <img src="{{ song.album_cover }}" alt="Cover"
+                    style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px; margin-right: 15px;">
+                {% endif %}
+                <div>
+                    <h6 class="mb-1">{{ song.song_title }}</h6>
+                    <p class="mb-1 text-muted small">{{ song.artist_name }} - {{ song.album_title or 'Unknown Album' }};
+                        Listened time:{{ song.listened_time_formatted }}</p>
+                </div>
+            </div>
+            <div class="text-end">
+                <small class="text-muted">Play</small>
+                <a href="{{ url_for('song', song_id=song.song_id) }}" class="btn btn-sm btn-outline-primary ms-3"
+                    title="Play Song">
+                    <i class="bi bi-play-fill"></i>
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+    {% else %}
+    <p>No listening history yet.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

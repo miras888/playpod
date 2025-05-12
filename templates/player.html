@@ -1,0 +1,387 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ song.title }} - {{ song.artist }}{% endblock %}
+
+{% block head %}
+<style>
+    .player-wrapper {
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        color: white;
+        padding: 4rem 0;
+        min-height: 550px;
+        display: flex;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .player-wrapper::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.75);
+        z-index: 1;
+    }
+
+    .player-wrapper>.container {
+        position: relative;
+        z-index: 2;
+    }
+
+    .album-cover {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        border-radius: 10px;
+        max-width: 350px;
+        width: 100%;
+        height: auto;
+    }
+
+    .player-controls button {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 8px;
+        transition: all 0.2s ease-in-out;
+        border: 2px solid transparent;
+        flex-shrink: 0;
+    }
+
+    .player-controls button:hover {
+        transform: scale(1.1);
+        border-color: rgba(255, 255, 255, 0.7);
+    }
+
+    .play-pause-btn {
+        font-size: 2rem;
+        width: 70px !important;
+        height: 70px !important;
+        border-color: #fff !important;
+    }
+
+    .play-pause-btn:hover {
+        border-color: #fff !important;
+    }
+
+    .progress-bar-container {
+        width: 100%;
+        height: 8px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 4px;
+        cursor: pointer;
+        overflow: hidden;
+        margin-bottom: 10px;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background: #1abc9c;
+        width: 0%;
+        transition: width 0.1s linear;
+    }
+
+    .form-range {
+        width: 120px;
+        margin-right: 5px;
+    }
+
+    .player-actions-container {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .player-actions-container>* {
+        margin: 5px 10px;
+    }
+
+    .card {
+        border: none;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-img-top {
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .card-footer {
+        background-color: #e9ecef !important;
+        border-top: 1px solid rgba(0, 0, 0, 0.08);
+        display: flex;
+        justify-content: center;
+        padding: 0.75rem 1rem;
+    }
+
+    .card-footer .btn {
+        width: 100%;
+    }
+</style>
+{% endblock %}
+
+{% block main %}
+<div class="player-wrapper" style="background-image: url('{{ song.album_cover }}');">
+    <div class="container">
+        <div class="row align-items-center justify-content-center">
+            <div class="col-md-5 text-center mb-4 mb-md-0">
+                <img src="{{ song.album_cover }}" alt="{{ song.title }}" class="img-fluid album-cover">
+            </div>
+            <div class="col-md-7">
+                <h1 class="mb-2">{{ song.title }}</h1>
+                <h4 class="text-light opacity-75 mb-3">{{ song.artist }}</h4>
+                <p>Album: <span class="fw-bold">{{ song.album_title }}</span></p>
+                <div class="badge bg-secondary mb-4">{{ song.genre }}</div>
+
+                <div class="player-controls">
+                    <audio id="html5-audio-player" src="{{ song.audio_url }}"></audio>
+
+                    <div class="progress-bar-container">
+                        <div id="progress-bar" class="progress-bar" role="progressbar" aria-valuenow="0"
+                            aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <div id="current-time">0:00</div>
+                        <div id="duration">--:--</div>
+                    </div>
+                    <div class="d-flex justify-content-center align-items-center mb-3">
+                        <button class="btn btn-outline-light rounded-circle" id="previous-song" title="Previous Track">
+                            <i class="bi bi-skip-backward-fill"></i>
+                        </button>
+                        <button class="btn btn-light rounded-circle play-pause-btn" id="play-pause" title="Play/Pause">
+                            <i class="bi bi-play-fill" id="play-icon"></i>
+                        </button>
+                        <button class="btn btn-outline-light rounded-circle" id="next-song" title="Next Track">
+                            <i class="bi bi-skip-forward-fill"></i>
+                        </button>
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-center mt-3">
+                        <button class="btn btn-outline-light btn-sm rounded-circle me-2" id="volume-mute"
+                            title="Mute/Unmute">
+                            <i class="bi bi-volume-up-fill" id="volume-icon"></i>
+                        </button>
+                        <input type="range" id="volume-slider" class="form-range" min="0" max="1" step="0.01" value="1">
+                    </div>
+
+                    <div class="player-actions-container">
+                        {% if session.user_id %}
+                        <form action="{{ url_for('favorites') }}" method="post" class="form-action-favorite">
+                            <input type="hidden" name="song_id" value="{{ song.id }}">
+                            <input type="hidden" name="action"
+                                value="{% if is_favorite %}remove{% else %}add{% endif %}">
+                            <button type="submit"
+                                class="btn btn-{% if is_favorite %}danger{% else %}outline-danger{% endif %}">
+                                <i class="bi bi-heart{% if is_favorite %}-fill{% endif %} me-1"></i>
+                                {% if is_favorite %}Remove{% else %}Add{% endif %}
+                            </button>
+                        </form>
+                        {% endif %}
+                        <div class="form-check form-switch d-flex align-items-center">
+                            <input class="form-check-input me-2" type="checkbox" id="radio-mode">
+                            <label class="form-check-label text-white opacity-75" for="radio-mode">
+                                <i class="bi bi-broadcast me-1"></i> Radio Mode
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if suggested_songs %}
+<div class="container my-5">
+    <h2 class="mb-4">Suggested Next Songs</h2>
+    <p class="text-muted">Turn on Radio Mode to automatically play these songs next</p>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for suggested in suggested_songs %}
+        <div class="col">
+            <div class="card h-100">
+                <img src="{{ suggested.cover }}" class="card-img-top" alt="{{ suggested.title }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ suggested.title }}</h5>
+                    <p class="card-text text-muted">{{ suggested.artist }}</p>
+                    <p class="text-muted small mb-0">From {{ suggested.album_title }}</p>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('song', song_id=suggested.id) }}" class="btn btn-sm btn-primary">
+                        <i class="bi bi-play-fill me-1"></i> Play
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const audio = document.getElementById('html5-audio-player');
+        const playPauseBtn = document.getElementById('play-pause');
+        const playIcon = document.getElementById('play-icon');
+        const progressBarContainer = document.querySelector('.progress-bar-container');
+        const progressBar = document.getElementById('progress-bar');
+        const currentTimeEl = document.getElementById('current-time');
+        const durationEl = document.getElementById('duration');
+        const radioModeCheckbox = document.getElementById('radio-mode');
+        const volumeMuteBtn = document.getElementById('volume-mute');
+        const volumeIcon = document.getElementById('volume-icon');
+        const volumeSlider = document.getElementById('volume-slider');
+        const suggestedSongs = {{ suggested_songs | tojson | safe
+    }};
+    let lastVolume = 1;
+
+    function formatTime(seconds) {
+        if (isNaN(seconds) || seconds === Infinity) return '--:--';
+        const minutes = Math.floor(seconds / 60);
+        seconds = Math.floor(seconds % 60);
+        return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }
+
+    function togglePlay() {
+        if (audio.paused || audio.ended) {
+            audio.play().then(() => {
+                playIcon.classList.replace('bi-play-fill', 'bi-pause-fill');
+            }).catch(error => {
+                console.error('Playback failed:', error);
+                playIcon.classList.replace('bi-pause-fill', 'bi-play-fill');
+            });
+        } else {
+            audio.pause();
+            playIcon.classList.replace('bi-pause-fill', 'bi-play-fill');
+        }
+    }
+
+    function updateProgress() {
+        if (!isNaN(audio.duration) && audio.duration > 0) {
+            const percent = (audio.currentTime / audio.duration) * 100;
+            progressBar.style.width = `${percent}%`;
+            currentTimeEl.textContent = formatTime(audio.currentTime);
+        } else {
+            progressBar.style.width = '0%';
+            currentTimeEl.textContent = formatTime(audio.currentTime);
+        }
+    }
+
+    function setVolume(volume) {
+        if (audio) {
+            audio.volume = parseFloat(volume);
+            updateVolumeIcon(audio.volume);
+        }
+    }
+
+    function toggleMute() {
+        if (audio) {
+            if (audio.volume > 0) {
+                lastVolume = audio.volume;
+                setVolume(0);
+                volumeSlider.value = 0;
+            } else {
+                const targetVolume = lastVolume > 0 ? lastVolume : 0.5;
+                setVolume(targetVolume);
+                volumeSlider.value = targetVolume;
+            }
+        }
+    }
+
+    function updateVolumeIcon(volume) {
+        const icon = volumeIcon;
+        icon.classList.remove('bi-volume-up-fill', 'bi-volume-down-fill', 'bi-volume-mute-fill');
+        if (volume === 0) {
+            icon.classList.add('bi-volume-mute-fill');
+        } else if (volume > 0 && volume < 0.5) {
+            icon.classList.add('bi-volume-down-fill');
+        } else {
+            icon.classList.add('bi-volume-up-fill');
+        }
+    }
+
+    // Event listeners
+    audio.addEventListener('loadedmetadata', function () {
+        if (!isNaN(audio.duration) && audio.duration > 0) {
+            durationEl.textContent = formatTime(audio.duration);
+        } else {
+            durationEl.textContent = '--:--';
+        }
+    });
+
+    audio.addEventListener('timeupdate', updateProgress);
+    audio.addEventListener('ended', function () {
+        playIcon.classList.replace('bi-pause-fill', 'bi-play-fill');
+        if (radioModeCheckbox.checked && suggestedSongs.length > 0) {
+            window.location.href = `/song/${suggestedSongs[0].id}`;
+        }
+    });
+
+    audio.addEventListener('error', function (e) {
+        console.error('Audio error:', e);
+        playIcon.classList.replace('bi-pause-fill', 'bi-play-fill');
+        durationEl.textContent = 'Error';
+    });
+
+    progressBarContainer.addEventListener('click', function (e) {
+        if (!isNaN(audio.duration) && audio.duration > 0) {
+            const rect = progressBarContainer.getBoundingClientRect();
+            const offsetX = e.clientX - rect.left;
+            const percent = offsetX / rect.width;
+            audio.currentTime = percent * audio.duration;
+        }
+    });
+
+    playPauseBtn.addEventListener('click', togglePlay);
+    document.getElementById('previous-song').addEventListener('click', function () {
+        audio.currentTime = 0;
+        if (audio.paused) audio.play().catch(console.error);
+    });
+
+    document.getElementById('next-song').addEventListener('click', function () {
+        if (radioModeCheckbox.checked && suggestedSongs.length > 0) {
+            window.location.href = `/song/${suggestedSongs[0].id}`;
+        }
+    });
+
+    volumeMuteBtn.addEventListener('click', toggleMute);
+    volumeSlider.addEventListener('input', function () {
+        setVolume(this.value);
+    });
+
+    // Initialize
+    audio.play().catch(() => {
+        playIcon.classList.replace('bi-pause-fill', 'bi-play-fill');
+    });
+    if (audio) {
+        volumeSlider.value = audio.volume;
+        updateVolumeIcon(audio.volume);
+    }
+});
+</script>
+{% endblock %}

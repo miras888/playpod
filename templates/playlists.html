@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+
+{% block title %}Your Playlists{% endblock %}
+
+{% block main %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Your Playlists</h1>
+            <p class="text-muted">Explore and manage your custom playlists</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="/create_playlist" class="btn btn-success btn-lg">
+                <i class="bi bi-plus-circle"></i> Create Playlist
+            </a>
+        </div>
+    </div>
+
+    {% if playlists %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for playlist in playlists %}
+        <div class="col">
+            <div class="card h-100 shadow-sm hover-shadow rounded-4 animate__animated animate__fadeInUp">
+                <div class="card-body">
+                    <h4 class="card-title">{{ playlist.title }}</h4>
+                    <p class="card-text text-muted">
+                        {{ playlist.song_count }} songs
+                    </p>
+                    <p class="small text-muted">Created on {{ playlist.created_at }}</p>
+                </div>
+                <div class="card-footer bg-transparent d-flex justify-content-between">
+                    <a href="/playlist/{{ playlist.id }}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-music-note-list"></i> Open
+                    </a>
+                    <a href="/edit_playlist/{{ playlist.id }}" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-pencil"></i> Edit
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center mt-5 animate__animated animate__fadeIn">
+        <i class="bi bi-folder-plus display-1 text-muted"></i>
+        <h3 class="mt-3">No playlists yet</h3>
+        <p>Start by creating your first playlist!</p>
+        <a href="/create_playlist" class="btn btn-success">Create Playlist</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

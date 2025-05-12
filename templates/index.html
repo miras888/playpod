@@ -1,0 +1,102 @@
+{% extends "layout.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block main %}
+<style>
+    .bg-primary {
+        background-color: #2c3e50 !important;
+    }
+</style>
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="jumbotron bg-primary text-white p-5 rounded">
+            <h1 class="display-4">Welcome to PlayPod</h1>
+            <p class="lead">Enjoy your favorite music.</p>
+            {% if not session.user_id %}
+            <div class="mt-4">
+                <a href="/register" class="btn btn-light me-2">Sign Up</a>
+                <a href="/login" class="btn btn-outline-light">Login</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex flex-wrap gap-2">
+            <a href="/"
+                class="btn btn-sm {% if not request.args.get('genre') %}btn-primary{% else %}btn-outline-primary{% endif %}">All</a>
+            {% for genre in genres %}
+            <a href="/filter?genre={{ genre.genre }}"
+                class="btn btn-sm {% if request.args.get('genre') == genre.genre %}btn-primary{% else %}btn-outline-primary{% endif %}">{{
+                genre.genre }}</a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-12">
+        <h2 class="mb-4">Featured Tracks</h2>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for track in featured_tracks %}
+            <div class="col">
+                <div class="card h-100 track-card">
+                    <img src="{{ track.cover }}" class="card-img-top" alt="{{ track.title }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ track.title }}</h5>
+                        <p class="card-text">{{ track.artist }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="badge bg-secondary">{{ track.genre }}</span>
+                            <span class="text-muted">{{ (track.duration / 60)|int }}:{{ '%02d' % (track.duration % 60)
+                                }}</span>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="/track/{{ track.id }}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-play-fill"></i> Play
+                            </a>
+                            {% if session.user_id %}
+                            <form action="/favorites" method="post">
+                                <input type="hidden" name="track_id" value="{{ track.id }}">
+                                <input type="hidden" name="action" value="add">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-heart"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <h2 class="mb-4">Albums</h2>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+            {% for album in albums %}
+            <div class="col">
+                <div class="card h-100 album-card">
+                    <img src="{{ album.cover }}" class="card-img-top" alt="{{ album.title }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ album.title }}</h5>
+                        <p class="card-text">{{ album.artist }}</p>
+                        <p class="card-text text-muted">{{ album.release_year }}</p>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <a href="/album/{{ album.id }}" class="btn btn-sm btn-primary w-100">View Album</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

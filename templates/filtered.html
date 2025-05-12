@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ selected_genre }} Songs{% endblock %}
+
+{% block main %}
+<div class="container py-5">
+    <h1 class="mb-4">Genre: <span class="text-capitalize">{{ selected_genre }}</span></h1>
+
+    {% if songs %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for song in songs %}
+        <div class="col">
+            <div class="card h-100">
+                <img src="{{ song.cover }}" class="card-img-top" alt="{{ song.title }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ song.title }}</h5>
+                    <p class="card-text text-muted">{{ song.artist }}</p>
+                    <span class="badge bg-secondary">{{ song.genre }}</span>
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <a href="/song/{{ song.id }}" class="btn btn-sm btn-primary">
+                        <i class="bi bi-play-fill"></i> Play
+                    </a>
+                    {% if session.user_id %}
+                    <form action="/favorites" method="post">
+                        <input type="hidden" name="song_id" value="{{ song.id }}">
+                        <input type="hidden" name="action" value="add">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-heart"></i>
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted">No songs found in this genre.</p>
+    {% endif %}
+</div>
+{% endblock %}

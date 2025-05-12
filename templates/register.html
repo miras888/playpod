@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+
+{% block title %}Register{% endblock %}
+
+{% block main %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 rounded">
+                <div class="card-body p-5">
+                    <h2 class="mb-4 text-center">Create Account</h2>
+                    <p class="text-muted text-center">Join PlayPod and start your music journey</p>
+                    <form action="/register" method="post">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control form-control-lg" id="username" name="username"
+                                required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control form-control-lg" id="password" name="password"
+                                required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="confirmation" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control form-control-lg" id="confirmation"
+                                name="confirmation" required>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success btn-lg">Register</button>
+                        </div>
+                    </form>
+                    <hr class="my-4">
+                    <p class="text-center">Already have an account? <a href="/login">Login here</a>.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

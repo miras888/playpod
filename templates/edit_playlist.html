@@ -1,0 +1,118 @@
+{% extends "layout.html" %}
+
+{% block title %}Edit {{ playlist.title }}{% endblock %}
+
+{% block main %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Edit Playlist: {{ playlist.title }}</h3>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('edit_playlist', playlist_id=playlist.id) }}" method="post">
+                        <div class="row mb-4">
+                            <div class="col-md-8 mb-3 mb-md-0">
+                                <label for="title" class="form-label">Playlist Title</label>
+                                <input type="text" class="form-control" id="title" name="title"
+                                    value="{{ playlist.title }}" required>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="is_public" name="is_public" {%
+                                        if playlist.is_public %}checked{% endif %}>
+                                    <label class="form-check-label" for="is_public">
+                                        Public Playlist
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h4 class="mb-3">Songs</h4>
+                            {% if songs %}
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 50px;"></th>
+                                            <th>Song</th>
+                                            <th>Artist</th>
+                                            <th>Album</th>
+                                            <th style="width: 100px;">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for song in songs %}
+                                        <tr>
+                                            <td>
+                                                <img src="{{ song.cover }}" class="rounded" width="40" height="40">
+                                            </td>
+                                            <td>{{ song.title }}</td>
+                                            <td>{{ song.artist }}</td>
+                                            <td>{{ song.album_title }}</td>
+                                            <td class="text-center">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="remove_song"
+                                                        value="{{ song.id }}" id="remove_{{ song.id }}">
+                                                    <label class="form-check-label text-danger"
+                                                        for="remove_{{ song.id }}">
+                                                        Remove
+                                                    </label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle me-2"></i>
+                                This playlist has no songs yet.
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('playlist', playlist_id=playlist.id) }}"
+                                class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-2"></i>Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h4 class="mb-0">Add More Songs</h4>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('all_songs') }}" class="btn btn-outline-primary">
+                            <i class="bi bi-music-note-list me-2"></i>Browse All Songs
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
